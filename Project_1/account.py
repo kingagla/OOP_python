@@ -1,5 +1,10 @@
 import time
 import datetime
+import warnings
+
+
+class TransactionTypeError(Exception):
+    pass
 
 
 class BankAccount:
@@ -43,20 +48,28 @@ class BankAccount:
     def _generate_confirmation_number(self, transaction_type):
         return f'{transaction_type}-{self.account_number}-{datetime.datetime.now().strftime("%Y%m%d%H%M%S")}'
 
-    def transaction(self, type_, amount):
+    def transaction(self, transaction_type, amount):
         if not (isinstance(amount, (float, int)) and amount > 0):
             raise ValueError('Transaction amount must be positive value')
-        if type_ == 'deposit':
+        if transaction_type == 'deposit':
             self.balance += amount
             transaction_type = 'D'
-        elif type_ == 'withdrawals':
+        elif transaction_type == 'withdrawal':
             if self.balance < amount:
                 transaction_type = 'X'
             else:
                 self.balance -= amount
                 transaction_type = 'W'
+        else:
+            raise TransactionTypeError("Transaction type must be one of: ('deposit', 'withdrawal')")
         return self._generate_confirmation_number(transaction_type)
 
     def interest_deposit(self):
-        self.balance *= (1+self.interest_rate)
+        self.balance *= (1 + self.interest_rate)
         return self._generate_confirmation_number('I')
+
+    @staticmethod
+    def transaction_info(transaction_id, timezone):
+        pass
+    # https://www.techatbloomberg.com/blog/work-dates-time-python/ douczyc sie o timezone i to co mam zmienic na taki
+    # timezone zeby wszystko wszedzie zwracalo jak nalezy
