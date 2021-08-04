@@ -86,3 +86,4 @@ class BankAccount:
             transaction_number = int(transaction_number)
 
     # utc_time rozdzielic, zamienic na inty i zrobic z tego datetime.datetime() i ustawic timezone
+    # Przygotowac unittesty
