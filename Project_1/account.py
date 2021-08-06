@@ -1,6 +1,5 @@
-import time
 import datetime
-import warnings
+import time
 from dateutil.tz import tzoffset
 
 
@@ -80,11 +79,17 @@ class BankAccount:
 
     @staticmethod
     def transaction_info(transaction_id, timezone):
-        class Result:
+        class TransactionInfo:
             transaction_type, account_number, utc_time, transaction_number = transaction_id.split('-')
             account_number = int(account_number)
             transaction_number = int(transaction_number)
-            date_utc = datetime.strptime(utc_time, "%Y%m%d%H%M%S")
+            date_utc = datetime.datetime.strptime(utc_time, "%Y%m%d%H%M%S")
+            transaction_datetime = date_utc + timezone.utcoffset(date_utc)
+            transaction_datetime = transaction_datetime.strftime('%Y-%m-%d %H:%M:%S')
 
-    # figure out how to set the timezone
-    # Prepare unittests
+        transaction_info = TransactionInfo()
+        return transaction_info
+
+
+if __name__ == '__main__':
+    pass
