@@ -1,5 +1,6 @@
 import datetime
 import time
+import logging
 from dateutil.tz import tzoffset
 
 
@@ -8,24 +9,36 @@ class TransactionTypeError(Exception):
 
 
 class BankAccount:
-    transaction_number = 0
+    _transaction_number = 0
     interest_rate = 0.005
     _acc_numbers = []
 
     def __init__(self, account_number, first_name, last_name, timezone=None, initial_deposit=None):
-        if account_number in self._acc_numbers:
+        if account_number in BankAccount._acc_numbers:
             raise ValueError("Account number must be UNIQUE! Please provide other number!")
         self._account_number = account_number
         self._acc_numbers.append(account_number)
         self._balance = 0
-        self._set_owner((first_name, last_name))
+        self.owner = (first_name, last_name)
         if isinstance(timezone, tzoffset):
-            self.timezone = timezone
+            self._timezone = timezone
         else:
-            self.timezone = datetime.timezone(datetime.timedelta(seconds=time.altzone * -1))
+            self._timezone = datetime.timezone(datetime.timedelta(seconds=time.altzone * -1))
         self.history = []
         if initial_deposit:
             self.transaction('deposit', initial_deposit)
+
+    @property
+    def timezone(self):
+        return self._timezone
+
+    @timezone.setter
+    def timezone(self, timezone):
+        if isinstance(timezone, tzoffset):
+            self._timezone = timezone
+        else:
+            logging.warning("Timezone must be tzoffset instance. Your timezone was set using your device's timezone.")
+            self._timezone = datetime.timezone(datetime.timedelta(seconds=time.altzone * -1))
 
     def _get_owner(self):
         return self._owner
@@ -34,7 +47,6 @@ class BankAccount:
         try:
             first_name, last_name = owner
             self._owner = first_name + " " + last_name
-            return self._owner
         except ValueError:
             raise ValueError("Account owner should be given as tuple (first_name, last_name)")
 
@@ -49,9 +61,9 @@ class BankAccount:
         return self._balance
 
     def _generate_confirmation_number(self, transaction_type):
-        self.transaction_number += 1
+        BankAccount._transaction_number += 1
         return f'{transaction_type}-{self.account_number}-\
-{datetime.datetime.now(datetime.timezone.utc).strftime("%Y%m%d%H%M%S")}-{self.transaction_number}'
+{datetime.datetime.now(datetime.timezone.utc).strftime("%Y%m%d%H%M%S")}-{self._transaction_number}'
 
     def transaction(self, transaction_type, amount):
         if not (isinstance(amount, (float, int)) and amount > 0):
