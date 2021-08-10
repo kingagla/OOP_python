@@ -63,7 +63,7 @@ class BankAccount:
     def _generate_confirmation_number(self, transaction_type):
         BankAccount._transaction_number += 1
         return f'{transaction_type}-{self.account_number}-\
-{datetime.datetime.now(datetime.timezone.utc).strftime("%Y%m%d%H%M%S")}-{self._transaction_number}'
+{datetime.datetime.utcnow().strftime("%Y%m%d%H%M%S")}-{self._transaction_number}'
 
     def transaction(self, transaction_type, amount):
         if not (isinstance(amount, (float, int)) and amount > 0):
