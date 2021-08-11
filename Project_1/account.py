@@ -17,7 +17,6 @@ class BankAccount:
         if account_number in BankAccount._acc_numbers:
             raise ValueError("Account number must be UNIQUE! Please provide other number!")
         self._account_number = account_number
-        self._acc_numbers.append(account_number)
         self._balance = 0
         self.owner = (first_name, last_name)
         if isinstance(timezone, tzoffset):
@@ -27,6 +26,7 @@ class BankAccount:
         self.history = []
         if initial_deposit:
             self.transaction('deposit', initial_deposit)
+        self._acc_numbers.append(account_number)
 
     @property
     def timezone(self):
